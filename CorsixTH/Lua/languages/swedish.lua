@@ -358,6 +358,7 @@ errors = {
 confirmation = {
   needs_restart = "Att ändra denna inställning kräver en omstart av spelet. Osparad data kommer att gå förlorad. Är du säker på att du vill göra detta?",
   abort_edit_room = "Du håller på att bygga eller ändra ett rum. Om alla obligatoriska föremål är placerade kommer rummet att färdigställas som det är, annars tas det bort. Fortsätta?",
+  maximum_screen_size = "Du har fyllt i en storlek som är större än 3000 x 2000. Så stora upplösningar är möjliga, men kräver bra hårdvara för att fungera felfritt. Vill du fortsätta?",
 }
 
 information = {
