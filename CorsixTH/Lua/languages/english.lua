@@ -47,6 +47,13 @@ confirmation.restart_level = "Are you sure you want to restart the level?"
 -- TODO adviser.multiplayer.objective_completed
 -- TODO adviser.multiplayer.objective_failed
 
+-- Replace Billy Savile
+-- this is only relevant to the English game so does not need adding
+-- in other language files
+vip_names = {
+ [6] = "Sir Lancelot Spratt",
+}
+
 -- A small error in the introduction text of level 2
 introduction_texts.level2[6] = "Aim for a reputation of 300 a bank balance of $10,000 and 40 people cured."
 -- An override for the squits becoming the the squits see issue 1646
@@ -75,9 +82,9 @@ menu_file = {
 }
 
 menu_options = {
-  sound = "  (ALT+S)  SOUND   ",
-  announcements = "  (ALT+A)  ANNOUNCEMENTS   ",
-  music = "  (ALT+M)  MUSIC   ",
+  sound = "  (ALT+S) SOUND   ",
+  announcements = "  (ALT+A) ANNOUNCEMENTS   ",
+  music = "  (ALT+M) MUSIC   ",
   jukebox = "  (J) JUKEBOX  ",
   lock_windows = "  LOCK WINDOWS  ",
   edge_scrolling = "  EDGE SCROLLING  ",
@@ -168,7 +175,7 @@ adviser = {
     falling_4 = "This is an Hospital, not a Theme Park!",
     falling_5 = "This is not the place for knocking people over, they're ill you know!",
     falling_6 = "This is not a bowling alley, sick people should not be treated like that!",
-    research_screen_open_1 = "You have to build a Research Department before you can access the Reasearch screen.",
+    research_screen_open_1 = "You have to build a Research Department before you can access the Research screen.",
     research_screen_open_2 = "Research is disabled for the current level.",
     researcher_needs_desk_1 = "A Researcher needs to have a desk to work at.",
     researcher_needs_desk_2 = "Your Researcher is pleased that you have allowed him to have a break. If you were intending to have more staff researching, then you need to provide them each with a desk to work from.",

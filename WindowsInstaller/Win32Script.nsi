@@ -59,7 +59,7 @@ RequestExecutionLevel admin
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
 ; License page
-!insertmacro MUI_PAGE_LICENSE "..\LICENSE"
+!insertmacro MUI_PAGE_LICENSE "..\LICENSE.txt"
 ; Directory page
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE ValidateDirectory
 !insertmacro MUI_PAGE_DIRECTORY
@@ -179,6 +179,12 @@ FunctionEnd
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
+
+  ${If} ${FileExists} "$INSTDIR\Lua"
+    RMDir /r "$INSTDIR\Lua"
+    CreateDirectory "$INSTDIR\Lua"
+  ${EndIf}
+
   ${If} ${RunningX64}
     File /r /x .svn x64\*.*
     Goto continued
@@ -221,10 +227,6 @@ Section "MainSection" SEC01
   
   ; The three other needed folders
   ; The old Lua folder is deleted first, if any exists, so that the game can start properly.
-  ${If} ${FileExists} "$INSTDIR\Lua"
-    RMDir /r "$INSTDIR\Lua"
-    CreateDirectory "$INSTDIR\Lua"
-  ${EndIf}
   SetOutPath "$INSTDIR\Lua"
   File /r /x .svn ..\CorsixTH\Lua\*.*
   
@@ -241,8 +243,8 @@ Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   File ..\CorsixTH\*.lua
   File ..\CorsixTH\changelog.txt
-  File ..\LICENSE
-  File ..\README
+  File ..\LICENSE.txt
+  File ..\README.txt
   
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   !insertmacro MUI_STARTMENU_WRITE_END
@@ -300,6 +302,8 @@ Section Uninstall
   RMDir /r "$INSTDIR\Lua"
   RMDir /r "$INSTDIR\Bitmap"
   RMDir /r "$INSTDIR\Levels"
+  RMDir /r "$INSTDIR\mime"
+  RMDir /r "$INSTDIR\socket"
   RMDir /r "$INSTDIR\Src"
   
   Delete "$INSTDIR\*.*"

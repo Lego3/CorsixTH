@@ -240,26 +240,30 @@ function Hospital:praiseBench()
   end  
 end
 
--- Messages regarding numbers cured and killed
+--! Messages regarding numbers cured and killed
 function Hospital:msgCured()
   local msg_chance = math.random(1, 15)
-  if msg_chance == 3 and self.msg_counter > 10 then
-    self.world.ui.adviser:say(_A.level_progress.another_patient_cured:format(self.num_cured))
-    self.msg_counter = 0
-  elseif msg_chance == 12 and self.msg_counter > 10 then
-    self.world.ui.adviser:say(_A.praise.patients_cured:format(self.num_cured))
-    self.msg_counter = 0   
+  if self.num_cured > 1 then
+    if msg_chance == 3 and self.msg_counter > 10 then
+      self.world.ui.adviser:say(_A.level_progress.another_patient_cured:format(self.num_cured))
+      self.msg_counter = 0
+    elseif msg_chance == 12 and self.msg_counter > 10 then
+      self.world.ui.adviser:say(_A.praise.patients_cured:format(self.num_cured))
+      self.msg_counter = 0
+    end      
   end 
 end
--- So the messages don't show too often there will need to be at least 10 days before one can show again.
+--! So the messages don't show too often there will need to be at least 10 days before one can show again.
 function Hospital:msgKilled()
-  local msg_chance = math.random(1, 10)      
-  if msg_chance < 4 and self.msg_counter > 10 then
-    self.world.ui.adviser:say(_A.warnings.many_killed:format(self.num_deaths))
-    self.msg_counter = 0
-  elseif msg_chance > 7 and self.msg_counter > 10 then
-    self.world.ui.adviser:say(_A.level_progress.another_patient_killed:format(self.num_deaths))
-    self.msg_counter = 0    
+  local msg_chance = math.random(1, 10) 
+  if self.num_deaths > 1 then  
+    if msg_chance < 4 and self.msg_counter > 10 then
+      self.world.ui.adviser:say(_A.warnings.many_killed:format(self.num_deaths))
+      self.msg_counter = 0
+    elseif msg_chance > 7 and self.msg_counter > 10 then
+      self.world.ui.adviser:say(_A.level_progress.another_patient_killed:format(self.num_deaths))
+      self.msg_counter = 0 
+    end      
   end   
 end
 
@@ -774,7 +778,7 @@ end
 
 function Hospital:purchasePlot(plot_number)
   local map = self.world.map
-  if map.th:isParcelPurchasable(plot_number, self:getPlayerIndex()) then
+  if map.th:isParcelPurchasable(plot_number, self:getPlayerIndex()) and not self.world.ui.transparent_walls then
     local cost = not self.world.free_build_mode and map:getParcelPrice(plot_number) or 0
     if cost <= self.balance then
       self.world:setPlotOwner(plot_number, self:getPlayerIndex())

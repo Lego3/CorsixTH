@@ -221,6 +221,7 @@ function World:initLevel(app)
         vis = disease.visuals_id and visual[disease.visuals_id].Value 
         or non_visual[disease.non_visuals_id].Value
       end
+      -- TODO: Where the value is greater that 0 should determine the frequency of the patients
       if vis ~= 0 then
         self.available_diseases[#self.available_diseases + 1] = disease
         self.available_diseases[disease.id] = disease
@@ -487,12 +488,38 @@ function World:spawnPatient(hospital)
   if not hospital then
     hospital = self:getLocalPlayerHospital()
   end
+  --! What is the current month?
+  local current_month = (self.year - 1) * 12 + self.month 
+  --! level files can delay visuals to a given month
+  --! and / or until a given number of patients have arrived
+  local hold_visual_months = self.map.level_config.gbv.HoldVisualMonths
+  local hold_visual_peep_count = self.map.level_config.gbv.HoldVisualPeepCount
+  --! Function to determine whether a given disease is visible and available.
+  --!param disease (disease) Disease to test.
+  --!return (boolean) Whether the disease is visible and available.
+  local function isVisualDiseaseAvailable(disease)
+    if not disease.visuals_id then 
+      return true
+    end
+    --! if the month is greater than either of these values then visuals will not appear in the game
+    if hold_visual_months and hold_visual_months > current_month or
+    hold_visual_peep_count and hold_visual_peep_count > hospital.num_visitors then
+      return false
+    end
+    --! the value against #visuals_available determines from which month a disease can appear. 0 means it can show up anytime.
+    local level_config = self.map.level_config 
+    if level_config.visuals_available[disease.visuals_id].Value >= current_month then 
+      return false
+    end   
+    return true
+  end 
+
   if hospital:hasStaffedDesk() then
     local spawn_point = self.spawn_points[math.random(1, #self.spawn_points)]
     local patient = self:newEntity("Patient", 2)
     local disease = self.available_diseases[math.random(1, #self.available_diseases)]
-    while disease.only_emergency do
-      disease = self.available_diseases[math.random(1, #self.available_diseases)]
+    while disease.only_emergency or not isVisualDiseaseAvailable(disease) do
+      disease = self.available_diseases[math.random(1, #self.available_diseases)] 
     end
     patient:setDisease(disease)
     patient:setNextAction{name = "spawn", mode = "spawn", point = spawn_point}
@@ -876,11 +903,22 @@ local tick_rates = {
   ["Normal"]             = {1, 3},
   ["Max speed"]          = {1, 1},
   ["And then some more"] = {3, 1},
+  ["Speed Up"]           = {4, 1},
 }
 
 -- Return the length of the current month
 function World:getCurrentMonthLength()
   return month_length[self.month]
+end
+
+function World:speedUp()
+  self:setSpeed("Speed Up")
+end
+
+function World:previousSpeed()
+  if self:isCurrentSpeed("Speed Up") then
+    self:setSpeed(self.prev_speed)
+  end
 end
 
 -- Return if the selected speed the same as the current speed.
@@ -1457,6 +1495,9 @@ function World:winGame(player_no)
       end
     end
     self.hospitals[player_no].game_won = true
+    if self:isCurrentSpeed("Speed Up") then
+      self:previousSpeed()
+    end
     self:setSpeed("Pause")
     self.ui.app.video:setBlueFilterActive(false)
     self.ui.bottom_panel:queueMessage("information", message, nil, 0, 2, callback)
@@ -2271,6 +2312,9 @@ function World:afterLoad(old, new)
   if old < 77 then
     self.ui:addKeyHandler({"shift", "+"}, self, self.adjustZoom, 5)
     self.ui:addKeyHandler({"shift", "-"}, self, self.adjustZoom, -5)  
+  end
+  if old < 80 then
+    self:determineWinningConditions()
   end
   
   self.savegame_version = new
